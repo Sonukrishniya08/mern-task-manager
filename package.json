@@ -1,0 +1,24 @@
+{
+  "name": "mern-task-manager",
+  "version": "1.0.0",
+  "description": "MERN Stack Internship Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sonukrishniya08/mern-task-manager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Sonukrishniya08/mern-task-manager/issues"
+  },
+  "homepage": "https://github.com/Sonukrishniya08/mern-task-manager#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
