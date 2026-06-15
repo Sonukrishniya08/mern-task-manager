@@ -1,9 +1,6 @@
-const mongoose =
-require("mongoose");
+const mongoose = require("mongoose");
 
-const connectDB =
-async () => {
-
+const connectDB = async () => {
     try {
 
         await mongoose.connect(
@@ -14,9 +11,12 @@ async () => {
             "MongoDB Connected"
         );
 
-    } catch(error) {
+    } catch (error) {
 
-        console.log(error);
+        console.log(
+            "Database Error:",
+            error.message
+        );
 
         process.exit(1);
     }
