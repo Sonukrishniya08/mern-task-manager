@@ -3,12 +3,13 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 app.use(express.json());
-app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
     res.json({
         message: "Task Manager API Running"
     });
 });
+
+app.use("/api/auth", authRoutes);
 
 module.exports = app;

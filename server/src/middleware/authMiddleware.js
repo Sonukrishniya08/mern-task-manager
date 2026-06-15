@@ -1,49 +1,12 @@
-const jwt =
-require("jsonwebtoken");
+const authMiddleware =
+(req, res, next) => {
+
+    console.log(
+        "Auth Middleware Executed"
+    );
+
+    next();
+};
 
 module.exports =
-(req,res,next)=>{
-
-const token =
-req.header(
-"Authorization"
-);
-
-if(!token){
-
-return res
-.status(401)
-.json({
-message:
-"No Token"
-});
-}
-
-try{
-
-const decoded =
-jwt.verify(
-
-token,
-
-process.env.JWT_SECRET
-
-);
-
-req.user =
-decoded;
-
-next();
-
-}
-catch{
-
-return res
-.status(401)
-.json({
-message:
-"Invalid Token"
-});
-}
-
-};
+authMiddleware;
