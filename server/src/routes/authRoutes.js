@@ -5,11 +5,42 @@ require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.get("/test", authMiddleware, (req, res) => {
+const {
+    register,
+    login
+} =
+require(
+"../controllers/authController"
+);
+
+router.post(
+"/register",
+register
+);
+
+
+router.post(
+"/login",
+login
+);
+
+
+router.get(
+
+"/profile",
+
+authMiddleware,
+
+(req, res) => {
 
     res.json({
+
         message:
-        "Auth Route Working"
+        "Protected Route Accessed",
+
+        user:
+        req.user
+
     });
 
 });
