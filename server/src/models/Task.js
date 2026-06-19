@@ -9,9 +9,13 @@ new mongoose.Schema({
         required: true
     },
 
-    description: String,
+    description:{ 
+        type: String
+    },
 
-    dueDate: Date,
+    dueDate: {
+        type: Date
+    },
 
     priority: {
         type: String,
@@ -19,7 +23,8 @@ new mongoose.Schema({
             "low",
             "medium",
             "high"
-        ]
+        ],
+        default: "medium"
     },
 
     status: {
@@ -28,17 +33,24 @@ new mongoose.Schema({
             "todo",
             "in-progress",
             "done"
-        ]
+        ],
+        default: "todo"
     },
 
     user: {
         type:
         mongoose.Schema.Types.ObjectId,
 
-        ref: "User"
+        ref: "User",
+
+        required: true
     }
 
-});
+},
+{
+    timestamps: true
+}
+);
 
 module.exports =
 mongoose.model(
