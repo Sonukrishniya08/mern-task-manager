@@ -1,0 +1,50 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fa;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 15px 40px;
+
+  background: #1e293b;
+  color: white;
+}
+
+.navbar button {
+  margin-left: 10px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.hero {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+}
+
+.hero h1 {
+  font-size: 3rem;
+}
+
+.hero p {
+  color: gray;
+}
+
+.feature-section {
+  padding: 40px;
+}
+
+.feature-card {
+  background: white;
+  margin: 15px 0;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
