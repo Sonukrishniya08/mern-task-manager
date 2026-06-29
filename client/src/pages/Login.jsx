@@ -1,29 +1,114 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import API from "../api/api";
+
 function Login() {
-  return (
-    <div className="page-container">
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        email: "",
+        password: ""
+    });
 
-      <div className="card">
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const handleChange = (e) => {
 
-        <h1>Login</h1>
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
 
-        <input
-          type="email"
-          placeholder="Email"
-        />
+        });
+    };
 
-        <input
-          type="password"
-          placeholder="Password"
-        />
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
 
-        <button>
-          Login
-        </button>
+        if (!formData.email || !formData.password) {
 
-      </div>
+            setError("Please fill all fields.");
 
-    </div>
-  );
+            return;
+        }
+        try {
+            setLoading(true);
+            const response = await API.post(
+                "/auth/login",
+                formData
+            );
+            localStorage.setItem(
+                "token",
+                response.data.token
+            );
+            navigate("/dashboard");
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                "Login Failed"
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+    return (
+        <div className="page-container">
+            <form
+                className="card"
+                onSubmit={handleSubmit}
+            >
+                <h1>Welcome Back</h1>
+                <p>Login to continue</p>
+                {error && (
+                    <p className="error">
+
+                        {error}
+
+                    </p>
+                )}
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+
+                    value={formData.email}
+
+                    onChange={handleChange}
+
+                />
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+
+                    value={formData.password}
+
+                    onChange={handleChange}
+
+                />
+
+                <button type="submit">
+                    {
+                        loading
+
+                        ?
+
+                        "Logging in..."
+                        :
+                        "Login"
+                    }
+                </button>
+                <p className="link-text">
+                    Don't have an account?
+                    {" "}
+                    <Link to="/register">
+                        Register
+
+                    </Link>
+
+                </p>
+            </form>
+        </div>
+    );
 }
 
 export default Login;

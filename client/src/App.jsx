@@ -53,6 +53,15 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        <Route
+          path="/task/:id"
+          element={
+            <PrivateRoute>
+              <TaskForm />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </>
   );

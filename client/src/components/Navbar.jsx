@@ -1,42 +1,38 @@
-// function Navbar() {
-//   return (
-//     <nav className="navbar">
-//       <h2>Task Manager</h2>
-
-//       <div>
-//         <button>Login</button>
-//         <button>Register</button>
-//       </div>
-//     </nav>
-//   );
-// }
-
-// export default Navbar;
-
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
-  return (
-    <nav className="navbar">
-      <h2>Task Manager</h2>
+    const navigate = useNavigate();
+    const token = localStorage.getItem("token");
+    const handleLogout = () => {
 
-      <div className="nav-links">
-        <Link to="/">Login</Link>
+        localStorage.removeItem("token");
+        navigate("/");
+    };
+    return (
+        <nav className="navbar">
+            <h2>Task Manager</h2>
+            <div className="nav-links">
+                {!token ? (
+                    <>
+                        <Link to="/">Login</Link>
+                        <Link to="/register">Register</Link>
 
-        <Link to="/register">
-          Register
-        </Link>
-
-        <Link to="/dashboard">
-          Dashboard
-        </Link>
-
-        <Link to="/task">
-          Task Form
-        </Link>
-      </div>
-    </nav>
-  );
+                    </>
+                ) : (
+                    <>
+                        <Link to="/dashboard">Dashboard</Link>
+                        <Link to="/task">Create Task</Link>
+                        <button
+                            className="logout-btn"
+                            onClick={handleLogout}
+                        >
+                            Logout
+                        </button>
+                    </>
+                )}
+            </div>
+        </nav>
+    );
 }
 
 export default Navbar;

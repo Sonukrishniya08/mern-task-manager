@@ -1,29 +1,111 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import API from "../api/api";
+
 function Register() {
-  return (
-    <div className="page-container">
 
-      <div className="card">
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        email: "",
+        password: ""
+    });
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-        <h1>Register</h1>
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
 
-        <input
-          type="email"
-          placeholder="Email"
-        />
+            [e.target.name]: e.target.value
+        });
+    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
 
-        <input
-          type="password"
-          placeholder="Password"
-        />
+        if (!formData.email || !formData.password) {
+            setError("Please fill all fields.");
+            return;
+        }
+        try {
+            setLoading(true);
+            const response = await API.post(
+                "/auth/register",
+                formData
+            );
+            alert("Registration Successful! Please login.");
 
-        <button>
-          Register
-        </button>
+            navigate("/");
+            // localStorage.setItem(
+            //     "token",
+            //     response.data.token
+            // );
+            // navigate("/dashboard");
+        }
+        catch (err) {
+            setError(
+                err.response?.data?.message ||
+                "Registration Failed"
+            );
+        }
+        finally {
+            setLoading(false);
+        }
+    };
+    return (
+        <div className="page-container">
+            <form
+                className="card"
+                onSubmit={handleSubmit}
+            >
+                <h1>Create Account</h1>
+                <p>Register to continue</p>
+                {
+                    error &&
 
-      </div>
+                    <p className="error">
 
-    </div>
-  );
+                        {error}
+
+                    </p>
+                }
+                <input
+                    type="email"
+                    name="email"
+
+                    placeholder="Email"
+                    value={formData.email}
+
+                    onChange={handleChange}
+                />
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+
+                    value={formData.password}
+
+                    onChange={handleChange}
+                />
+                <button type="submit">
+                    {
+                        loading
+
+                        ?
+                        "Creating Account..."
+                        :
+                        "Register"
+                    }
+                </button>
+                <p className="link-text">
+                    Already have an account?
+                    {" "}
+                    <Link to="/">
+                        Login
+                    </Link>
+                </p>
+            </form>
+        </div>
+    );
 }
-
 export default Register;
