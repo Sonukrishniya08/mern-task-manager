@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import TaskCard from "../components/TaskCard";
 import API from "../api/api";
 
 function Dashboard() {
@@ -51,10 +53,11 @@ function Dashboard() {
     }
     try {
       await API.delete(`/tasks/${id}`);
+      toast.success("Task Deleted Successfully!");
       fetchTasks();
     }
     catch (err) {
-      alert(
+      toast.error(
         err.response?.data?.message ||
         "Unable to delete task."
       );
@@ -91,63 +94,29 @@ function Dashboard() {
           :
           (
             <div className="task-grid">
+
               {
+
                 tasks.map((task) => (
-                  <div
+
+                  <TaskCard
+
                     key={task._id}
-                    className="task-card"
-                  >
-                    <div className="task-header">
-                      <h3>{task.title}</h3>
-                      <span
-                        className={`status ${task.status?.toLowerCase()}`}
-                      >
-                        {task.status}
-                      </span>
-                    </div>
-                    <p className="description">
-                      {task.description}
-                    </p>
-                    <div className="task-footer">
-                      <span className="priority">
-                        Priority:
-                        {" "}
-                        {task.priority}
-                      </span>
-                      {
-                        task.dueDate && (
-                          <span>
-                            Due:
-                            {" "}
-                            {
-                              new Date(task.dueDate)
-                                .toLocaleDateString()
-                            }
-                          </span>
-                        )
-                      }
-                    </div>
-                    <div className="action-buttons">
-                      <button
-                        className="edit-btn"
-                        onClick={() =>
-                          navigate(`/task/${task._id}`)
-                        }
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="delete-btn"
-                        onClick={() =>
-                          deleteTask(task._id)
-                        }
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
+
+                    task={task}
+
+                    onEdit={() =>
+                      navigate(`/task/${task._id}`)
+                    }
+
+                    onDelete={deleteTask}
+
+                  />
+
                 ))
+
               }
+
             </div>
           )
       }

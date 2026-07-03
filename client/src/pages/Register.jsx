@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import API from "../api/api";
 
 function Register() {
@@ -33,7 +34,7 @@ function Register() {
                 "/auth/register",
                 formData
             );
-            alert("Registration Successful! Please login.");
+            toast.success("Registration Successful!");
 
             navigate("/");
             // localStorage.setItem(
@@ -82,19 +83,21 @@ function Register() {
                     type="password"
                     name="password"
                     placeholder="Password"
-
                     value={formData.password}
-
                     onChange={handleChange}
+                    minLength={6}
+                    pattern="^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$"
+                    title="Password must be at least 6 characters and contain at least one special character (!@#$%^&*)"
+                    required
                 />
                 <button type="submit">
                     {
                         loading
 
-                        ?
-                        "Creating Account..."
-                        :
-                        "Register"
+                            ?
+                            "Creating Account..."
+                            :
+                            "Register"
                     }
                 </button>
                 <p className="link-text">

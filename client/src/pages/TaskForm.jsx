@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import API from "../api/api";
 
 function TaskForm() {
@@ -12,6 +13,7 @@ function TaskForm() {
     priority: "medium",
     status: "todo"
   });
+  const [originalData, setOriginalData] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -21,35 +23,36 @@ function TaskForm() {
   }, [id]);
   const fetchTask = async () => {
     try {
-      const response =
-        await API.get("/tasks");
-      const task =
-        response.data.find(
-          task => task._id === id
-        );
-      if (task) {
-        setFormData({
-          title:
-            task.title,
-          description:
-            task.description,
-          dueDate:
-            task.dueDate
-              ?
-              task.dueDate.substring(0, 10)
-              :
-              "",
-          priority:
-            task.priority,
-          status:
-            task.status
-        });
-      }
+      const response = await API.get(`/tasks/${id}`);
+      const task = response.data;
+      const formattedTask = {
+        title: task.title,
+        description: task.description,
+        dueDate: task.dueDate
+          ? task.dueDate.substring(0, 10)
+          : "",
+        priority: task.priority,
+        status: task.status
+      };
+      setFormData(formattedTask);
+      setOriginalData(formattedTask);
     }
     catch (error) {
       console.log(error);
     }
   };
+  const isChanged =
+    originalData
+      ?
+      (
+        formData.title !== originalData.title ||
+        formData.description !== originalData.description ||
+        formData.dueDate !== originalData.dueDate ||
+        formData.priority !== originalData.priority ||
+        formData.status !== originalData.status
+      )
+      :
+      true;
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -63,6 +66,9 @@ function TaskForm() {
       setError("Task title is required.");
       return;
     }
+    if (id && !isChanged) {
+      return;
+    }
     try {
       setLoading(true);
       if (id) {
@@ -70,17 +76,14 @@ function TaskForm() {
           `/tasks/${id}`,
           formData
         );
+        toast.success("Task Updated Successfully!");
       }
       else {
         await API.post(
           "/tasks",
           formData
         );
-      }
-      if (id) {
-        alert("Task Updated Successfully!");
-      } else {
-        alert("Task Created Successfully!");
+        toast.success("Task Created Successfully!");
       }
       setFormData({
         title: "",
@@ -94,7 +97,7 @@ function TaskForm() {
     catch (err) {
       setError(
         err.response?.data?.message ||
-        "Unable to create task."
+        "Unable to save task."
       );
     }
     finally {
@@ -104,38 +107,55 @@ function TaskForm() {
   return (
     <div className="page-container">
       <form
-        className="card"
+        className="task-form-card"
         onSubmit={handleSubmit}
       >
         <h1>
-          {
-            id
-              ?
-              "Edit Task"
-              :
-              "Create Task"
-          }
+          {id ? "Edit Task" : "Create New Task"}
         </h1>
-        {
-          error &&
-          <p className="error">
-            {error}
-          </p>
-        }
+        {error && <p className="error">{error}</p>}
+        <label>Title *</label>
         <input
           type="text"
           name="title"
-          placeholder="Task Title"
+          placeholder="What needs to be done?"
           value={formData.title}
           onChange={handleChange}
         />
+        <label>Description</label>
         <textarea
+          rows="5"
           name="description"
-          placeholder="Description"
-          rows="4"
+          placeholder="Add details (optional)"
           value={formData.description}
           onChange={handleChange}
         />
+        <div className="row">
+          <div className="field">
+            <label>Status</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+            >
+              <option value="todo">To Do</option>
+              <option value="in-progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+          <div className="field">
+            <label>Priority</label>
+            <select
+              name="priority"
+              value={formData.priority}
+              onChange={handleChange}
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
         <label>Due Date</label>
         <input
           type="date"
@@ -143,49 +163,28 @@ function TaskForm() {
           value={formData.dueDate}
           onChange={handleChange}
         />
-        <label>Priority</label>
-        <select
-          name="priority"
-          value={formData.priority}
-          onChange={handleChange}
-        >
-          <option value="low">
-            Low
-          </option>
-          <option value="medium">
-            Medium
-          </option>
-          <option value="high">
-            High
-          </option>
-        </select>
-        <label>Status</label>
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-        >
-          <option value="todo">
-            Todo
-          </option>
-          <option value="in-progress">
-            In Progress
-          </option>
-          <option value="done">
-            Done
-          </option>
-        </select>
-        <button
-          type="submit"
-        >
-          {
-            loading
-              ? "Saving..."
-              : id
-                ? "Update Task"
-                : "Save Task"
-          }
-        </button>
+        <div className="button-group">
+          <button
+            className="save-btn"
+            type="submit"
+            disabled={loading || (id && !isChanged)}
+          >
+            {
+              loading
+                ? "Saving..."
+                : id
+                  ? "Update Task"
+                  : "Create Task"
+            }
+          </button>
+          <button
+            type="button"
+            className="cancel-btn"
+            onClick={() => navigate("/dashboard")}
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

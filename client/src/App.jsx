@@ -9,14 +9,7 @@ import TaskForm from "./pages/TaskForm";
 
 import "./App.css";
 
-function App() {
-  // const features = [
-  //   "Secure Authentication",
-  //   "Task Management",
-  //   "JWT Protection",
-  //   "MongoDB Storage"
-  // ];
-
+ function App() {
   return (
     <>
       <Navbar />
