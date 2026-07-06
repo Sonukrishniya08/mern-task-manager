@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import TaskCard from "../components/TaskCard";
+import DeleteModal from "../components/DeleteModal";
 import API from "../api/api";
 
 function Dashboard() {
@@ -13,6 +14,8 @@ function Dashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -94,15 +97,17 @@ function Dashboard() {
       </div>
     );
   }
-  const deleteTask = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) {
-      return;
-    }
+  const deleteTask = (id) => {
+    setSelectedTaskId(id);
+    setShowDeleteModal(true);
+  };
+  const confirmDelete = async () => {
     try {
-      await API.delete(`/tasks/${id}`);
+      await API.delete(`/tasks/${selectedTaskId}`);
       toast.success("Task Deleted Successfully!");
       fetchTasks();
     }
+
     catch (err) {
       if (err.response?.status !== 401) {
         toast.error(
@@ -110,6 +115,11 @@ function Dashboard() {
           "Unable to delete task."
         );
       }
+    }
+
+    finally {
+      setShowDeleteModal(false);
+      setSelectedTaskId(null);
     }
   };
   return (
@@ -236,6 +246,14 @@ function Dashboard() {
             </div>
           )
       }
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSelectedTaskId(null);
+        }}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }
