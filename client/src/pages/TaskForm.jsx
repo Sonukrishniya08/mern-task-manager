@@ -95,10 +95,13 @@ function TaskForm() {
       navigate("/dashboard");
     }
     catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "Unable to save task."
-      );
+      if (err.response?.status !== 401) {
+        const message =
+          err.response?.data?.message ||
+          "Unable to save task.";
+        setError(message);
+        toast.error(message);
+      }
     }
     finally {
       setLoading(false);

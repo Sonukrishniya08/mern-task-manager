@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 
 const jwt = require("jsonwebtoken");
 
-exports.register = async (req, res) => {
+exports.register = async (req, res, next) => {
     try {
 
         const { email, password } = req.body;
@@ -13,22 +13,19 @@ exports.register = async (req, res) => {
 
         if (!passwordRegex.test(password)) {
 
-            return res.status(400).json({
-
-                message:
-                    "Password must be at least 6 characters and contain at least one special character."
-
-            });
-
+            const error = new Error(
+                "Password must be at least 6 characters and contain at least one special character."
+            );
+            error.statusCode = 400;
+            return next(error);
         }
 
         const existingUser =
             await User.findOne({ email });
         if (existingUser) {
-
-            return res.status(400).json({
-                message: "User already exists"
-            });
+            const error = new Error("User already exists");
+            error.statusCode = 400;
+            return next(error);
 
         }
 
@@ -56,16 +53,14 @@ exports.register = async (req, res) => {
                 {
                     id: user._id
                 },
-
                 process.env.JWT_SECRET,
                 {
                     expiresIn: "7d"
                 }
-
             );
 
         res.status(201).json({
-
+            success: true,
             message:
                 "User Registered Successfully",
 
@@ -76,15 +71,13 @@ exports.register = async (req, res) => {
     }
     catch (error) {
 
-        res.status(500).json({
-            message: error.message
-        });
+        next(error);
 
     }
 };
 
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
     try {
 
         const {
@@ -98,12 +91,9 @@ exports.login = async (req, res) => {
             });
 
         if (!user) {
-
-            return res.status(400).json({
-                message:
-                    "Invalid Credentials"
-            });
-
+            const error = new Error("Invalid Credentials");
+            error.statusCode = 400;
+            return next(error);
         }
 
         const isMatch =
@@ -113,12 +103,9 @@ exports.login = async (req, res) => {
             );
 
         if (!isMatch) {
-
-            return res.status(400).json({
-                message:
-                    "Invalid Credentials"
-            });
-
+            const error = new Error("Invalid Credentials");
+            error.statusCode = 400;
+            return next(error);
         }
 
         const token =
@@ -137,7 +124,7 @@ exports.login = async (req, res) => {
             );
 
         res.json({
-
+            success: true,
             message:
                 "Login Successful",
 
@@ -148,10 +135,7 @@ exports.login = async (req, res) => {
     }
     catch (error) {
 
-        res.status(500).json({
-            message:
-                error.message
-        });
+        next(error);
 
     }
 };

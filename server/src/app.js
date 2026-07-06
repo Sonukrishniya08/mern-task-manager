@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const errorMiddleware = require("./middleware/errorMiddleware");
 
 const authRoutes = require("./routes/authRoutes");
 
@@ -17,5 +18,6 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks",taskRoutes);
+app.use(errorMiddleware);
 
 module.exports = app;

@@ -42,11 +42,14 @@ function Login() {
                 response.data.token
             );
             navigate("/dashboard");
-        } catch (err) {
-            setError(
-                err.response?.data?.message ||
-                "Login Failed"
-            );
+        } 
+        catch (err) {
+            if (err.response?.status !== 401) {
+                toast.error(
+                    err.response?.data?.message ||
+                    "Login Failed."
+                );
+            }
         } finally {
             setLoading(false);
         }
@@ -91,11 +94,11 @@ function Login() {
                     {
                         loading
 
-                        ?
+                            ?
 
-                        "Logging in..."
-                        :
-                        "Login"
+                            "Logging in..."
+                            :
+                            "Login"
                     }
                 </button>
                 <p className="link-text">

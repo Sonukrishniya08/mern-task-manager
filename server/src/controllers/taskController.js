@@ -1,6 +1,6 @@
 const Task = require("../models/Task");
 
-exports.createTask = async (req, res) => {
+exports.createTask = async (req, res, next) => {
     try {
         const task = await Task.create({
             title: req.body.title,
@@ -12,105 +12,125 @@ exports.createTask = async (req, res) => {
         });
         res.status(201).json(task);
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+
+        next(error);
+
     }
 };
 
-exports.getTasks = async (req, res) => {
+exports.getTasks = async (req, res, next) => {
     try {
-        const tasks = await Task.find({
+        const { status, priority, sort } = req.query;
+        const query = {
             user: req.user.id
-        });
+        };
+        if (status) {
+            query.status = status;
+        }
+        if (priority) {
+            query.priority = priority;
+        }
+        let tasksQuery = Task.find(query);
+        if (sort === "asc") {
+            tasksQuery = tasksQuery.sort({
+                dueDate: 1
+            });
+        }
+        else if (sort === "desc") {
+            tasksQuery = tasksQuery.sort({
+                dueDate: -1
+            });
+        }
+        const tasks = await tasksQuery;
         res.json(tasks);
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+    }
+    catch (error) {
+
+        next(error);
+
     }
 };
 
-exports.getTaskById = async (req, res) => {
+exports.getTaskById = async (req, res, next) => {
     try {
         const task = await Task.findById(
             req.params.id
         );
         if (!task) {
-            return res.status(404).json({
-                message: "Task Not Found"
-            });
+            const error = new Error("Task Not Found");
+            error.statusCode = 404;
+            return next(error);
         }
         if (
             task.user.toString() !==
             req.user.id
         ) {
-            return res.status(403).json({
-                message: "Access Denied"
-            });
+            const error = new Error("Access Denied");
+            error.statusCode = 403;
+            return next(error);
         }
         res.json(task);
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+
+        next(error);
+
     }
 };
 
-exports.updateTask = async (req, res) => {
+exports.updateTask = async (req, res, next) => {
     try {
         const task = await Task.findById(
             req.params.id
         );
         if (!task) {
-            return res.status(404).json({
-                message: "Task Not Found"
-            });
+            const error = new Error("Task Not Found");
+            error.statusCode = 404;
+            return next(error);
         }
         if (
             task.user.toString() !==
             req.user.id
         ) {
-            return res.status(403).json({
-                message: "Access Denied"
-            });
+            const error = new Error("Access Denied");
+            error.statusCode = 403;
+            return next(error);
         }
         const updatedTask =
-        await Task.findByIdAndUpdate(
+            await Task.findByIdAndUpdate(
 
-            req.params.id,
+                req.params.id,
 
-            req.body,
-            {
-                returnDocument: "after",
-                runValidators: true
-            }
-        );
+                req.body,
+                {
+                    new: true,
+                    runValidators: true
+                }
+            );
         res.json(updatedTask);
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+
+        next(error);
+
     }
 };
 
-exports.deleteTask = async (req, res) => {
+exports.deleteTask = async (req, res, next) => {
     try {
         const task = await Task.findById(
             req.params.id
         );
         if (!task) {
-            return res.status(404).json({
-                message: "Task Not Found"
-            });
+            const error = new Error("Task Not Found");
+            error.statusCode = 404;
+            return next(error);
         }
         if (
             task.user.toString() !==
             req.user.id
         ) {
-            return res.status(403).json({
-                message: "Access Denied"
-            });
+            const error = new Error("Access Denied");
+            error.statusCode = 403;
+            return next(error);
         }
         await Task.findByIdAndDelete(
             req.params.id
@@ -120,8 +140,8 @@ exports.deleteTask = async (req, res) => {
             message: "Task Deleted Successfully"
         });
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+
+        next(error);
+
     }
 };

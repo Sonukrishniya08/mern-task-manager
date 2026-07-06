@@ -44,10 +44,12 @@ function Register() {
             // navigate("/dashboard");
         }
         catch (err) {
-            setError(
-                err.response?.data?.message ||
-                "Registration Failed"
-            );
+            if (err.response?.status !== 401) {
+                toast.error(
+                    err.response?.data?.message ||
+                    "Registration Failed."
+                );
+            }
         }
         finally {
             setLoading(false);

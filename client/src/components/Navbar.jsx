@@ -21,7 +21,7 @@ function Navbar() {
                 ) : (
                     <>
                         <Link to="/dashboard">Dashboard</Link>
-                        <Link to="/task">Create Task</Link>
+                        {/* <Link to="/task">Create Task</Link> */}
                         <button
                             className="logout-btn"
                             onClick={handleLogout}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API = axios.create({
 
@@ -15,6 +16,22 @@ API.interceptors.request.use(
         return config;
     },
     (error) => {
+        return Promise.reject(error);
+    }
+);
+
+API.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response) {
+            if (error.response.status === 401) {
+                localStorage.removeItem("token");
+                toast.error(
+                    "Session expired. Please login again."
+                );
+                window.location.href = "/";
+            }
+        }
         return Promise.reject(error);
     }
 );

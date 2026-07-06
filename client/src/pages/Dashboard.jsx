@@ -10,31 +10,78 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("asc");
+
   const navigate = useNavigate();
   useEffect(() => {
+
     fetchTasks();
-  }, []);
+
+  }, [
+
+    statusFilter,
+
+    priorityFilter,
+
+    sortOrder
+
+  ]);
   const fetchTasks = async () => {
+
     try {
+
       setLoading(true);
-      const response = await API.get("/tasks");
+
+      const params = {};
+
+      if (statusFilter !== "all") {
+        params.status = statusFilter;
+      }
+
+      if (priorityFilter !== "all") {
+        params.priority = priorityFilter;
+      }
+
+      if (sortOrder) {
+        params.sort = sortOrder;
+      }
+
+      const response = await API.get(
+        "/tasks",
+        {
+          params
+        }
+      );
+
       setTasks(response.data);
+
     }
     catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "Failed to fetch tasks."
-      );
+      if (err.response?.status !== 401) {
+        const message =
+          err.response?.data?.message ||
+          "Failed to fetch tasks.";
+        setError(message);
+        toast.error(message);
+      }
     }
+
     finally {
+
       setLoading(false);
+
     }
+
   };
   if (loading) {
     return (
       <div className="page-container">
-
-        <h2>Fetching your tasks...</h2>
+        <div className="loading-box">
+          <div className="loader"></div>
+          <p>Loading your tasks...</p>
+        </div>
       </div>
     );
   }
@@ -57,37 +104,106 @@ function Dashboard() {
       fetchTasks();
     }
     catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-        "Unable to delete task."
-      );
+      if (err.response?.status !== 401) {
+        toast.error(
+          err.response?.data?.message ||
+          "Unable to delete task."
+        );
+      }
     }
   };
   return (
     <div className="dashboard-container">
-      <div className="dashboard-title">
-        <h1>
-          Welcome Back
-        </h1>
-        <p>
-          Manage your daily work efficiently.
-        </p>
+      <div className="dashboard-header">
+
+        <div>
+
+          <h1 className="welc">Welcome Back</h1>
+
+          <p>Manage your daily work efficiently.</p>
+
+        </div>
+
         <button
           className="create-btn"
-          onClick={() =>
-            navigate("/task")
-          }
+          onClick={() => navigate("/task")}
         >
           + Create Task
         </button>
+
+      </div>
+
+      <div className="filter-section">
+
+        <div className="filter-toolbar">
+
+          <h3 className="filter-title">
+            Filter By
+          </h3>
+
+          <div className="filter-group">
+
+            <label>Status</label>
+
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="todo">To Do</option>
+              <option value="in-progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+
+          </div>
+
+          <div className="filter-group">
+
+            <label>Priority</label>
+
+            <select
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+
+          </div>
+
+          <div className="filter-group">
+
+            <label>Sort By</label>
+
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="asc">Oldest First</option>
+              <option value="desc">Newest First</option>
+            </select>
+
+          </div>
+
+          <div className="task-counter">
+
+            Showing <strong>{tasks.length}</strong> of{" "}
+            <strong>{tasks.length}</strong> Tasks
+
+          </div>
+
+        </div>
+
       </div>
       {
         tasks.length === 0 ?
           (
             <div className="empty-state">
-              <h3>No Tasks Yet 🚀</h3>
+              <h3>No Tasks Found</h3>
               <p>
-                Click "Create Task" to add your first task.
+                No task matches the selected filters.
               </p>
             </div>
           )
