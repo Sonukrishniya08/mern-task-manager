@@ -1,31 +1,3 @@
-# Task Manager Application
+# 📝 MERN Task Manager
 
-MERN Stack Internship Project
-
-## Project Overview
-
-A full-stack task management application built using:
-
-- MongoDB
-- Express.js
-- React.js
-- Node.js
-- JWT Authentication
-
-## Features
-
-- User Authentication
-- Task Creation & Management
-- Task Filtering & Sorting
-- Secure API Endpoints
-- Responsive User Interface
-
-## Project Structure
-
-/client → React frontend
-
-/server → Node.js & Express backend
-
-## Author
-
-Sonu Krishniya
+A modern and responsive Task Management application built using the MERN Stack. The application allows users to securely manage their daily tasks with authentication, filtering, sorting, and a clean user interface.
