@@ -76,3 +76,167 @@ Each user can access only their own tasks using JWT authentication.
 - Git
 - GitHub
 - VS Code
+
+## 📁 Project Structure
+
+client/
+│
+├── src/
+│ ├── api/
+│ ├── services/
+│ ├── components/
+│ ├── context/
+│ ├── pages/
+│ ├── App.jsx
+│ └── main.jsx
+│
+server/
+│
+├── src/
+│ ├── config/
+│ ├── controllers/
+│ ├── middleware/
+│ ├── models/
+│ ├── routes/
+│ ├── app.js
+└── server.js
+
+## 🚀 Installation
+
+### Clone Repository
+
+```bash
+git clone <repository-url>
+```
+
+### Install Backend
+
+```bash
+cd server
+npm install
+```
+
+### Install Frontend
+
+```bash
+cd client
+npm install
+```
+
+### Start Backend
+
+```bash
+npm run dev
+```
+
+### Start Frontend
+
+```bash
+npm run dev
+```
+
+## 🔑 Environment Variables
+
+Backend (.env)
+
+```env
+PORT=
+
+MONGO_URI=
+
+JWT_SECRET=
+```
+
+Frontend (.env)
+
+```env
+VITE_API_URL=
+```
+
+## 📡 API Endpoints
+
+### Authentication
+
+POST /api/auth/register
+
+```json
+{
+"email":"",
+"password":""
+}
+```
+
+POST /api/auth/login
+
+```json
+{
+"email":"",
+"password":""
+}
+```
+
+---
+
+### Tasks
+
+GET
+
+```
+/api/tasks
+```
+
+GET
+
+```
+/api/tasks/:id
+```
+
+POST
+
+```
+/api/tasks
+```
+
+PUT
+
+```
+/api/tasks/:id
+```
+
+DELETE
+
+```
+/api/tasks/:id
+```
+
+## 🔒 Authentication
+
+The application uses JWT Authentication.
+
+After successful login:
+
+- JWT Token is generated
+- Token is stored in Local Storage
+- Every API request automatically includes the Authorization header using Axios Interceptors.
+
+Example:
+
+Authorization
+
+Bearer <token>
+
+## 🚀 Future Improvements
+
+- Task Categories
+- Drag & Drop
+- Email Notifications
+- Mobile App
+
+## 👨‍💻 Author
+
+Developed as part of MERN Stack Internship.
+
+Built using React, Node.js, Express.js and MongoDB.
+
+
+
