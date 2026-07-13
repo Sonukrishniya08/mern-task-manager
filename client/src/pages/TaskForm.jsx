@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import API from "../api/api";
+import { useTasks } from "../context/TaskContext";
 
 function TaskForm() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { getTaskById, createTask, updateTask} = useTasks();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -23,8 +24,7 @@ function TaskForm() {
   }, [id]);
   const fetchTask = async () => {
     try {
-      const response = await API.get(`/tasks/${id}`);
-      const task = response.data;
+      const task = await getTaskById(id);
       const formattedTask = {
         title: task.title,
         description: task.description,
@@ -72,17 +72,11 @@ function TaskForm() {
     try {
       setLoading(true);
       if (id) {
-        await API.put(
-          `/tasks/${id}`,
-          formData
-        );
+        await updateTask( id, formData );
         toast.success("Task Updated Successfully!");
       }
       else {
-        await API.post(
-          "/tasks",
-          formData
-        );
+        await createTask(formData);
         toast.success("Task Created Successfully!");
       }
       setFormData({

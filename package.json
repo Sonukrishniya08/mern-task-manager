@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/Sonukrishniya08/mern-task-manager#readme",
   "dependencies": {
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0"
   }
 }

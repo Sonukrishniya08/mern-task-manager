@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import API from "../api/api";
+import { registerUser } from "../services/authService";
 
 function Register() {
 
@@ -30,18 +30,11 @@ function Register() {
         }
         try {
             setLoading(true);
-            const response = await API.post(
-                "/auth/register",
-                formData
-            );
+            const response = await registerUser(formData);
             toast.success("Registration Successful!");
 
             navigate("/");
-            // localStorage.setItem(
-            //     "token",
-            //     response.data.token
-            // );
-            // navigate("/dashboard");
+            
         }
         catch (err) {
             if (err.response?.status !== 401) {

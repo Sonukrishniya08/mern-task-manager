@@ -1,83 +1,46 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+
 import TaskCard from "../components/TaskCard";
+import FilterBar from "../components/FilterBar";
 import DeleteModal from "../components/DeleteModal";
-import API from "../api/api";
+import { useTasks } from "../context/TaskContext";
 
 function Dashboard() {
-
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const [error, setError] = useState("");
+  const { tasks, loading, error, fetchTasks, deleteTask } = useTasks();
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const navigate = useNavigate();
   useEffect(() => {
 
-    fetchTasks();
+    fetchTasks(buildQueryParams());
 
   }, [
-
     statusFilter,
-
     priorityFilter,
-
-    sortOrder
-
+    sortOrder,
   ]);
-  const fetchTasks = async () => {
 
-    try {
+  const buildQueryParams = () => {
+    const params = {};
 
-      setLoading(true);
-
-      const params = {};
-
-      if (statusFilter !== "all") {
-        params.status = statusFilter;
-      }
-
-      if (priorityFilter !== "all") {
-        params.priority = priorityFilter;
-      }
-
-      if (sortOrder) {
-        params.sort = sortOrder;
-      }
-
-      const response = await API.get(
-        "/tasks",
-        {
-          params
-        }
-      );
-
-      setTasks(response.data);
-
+    if (statusFilter !== "all") {
+      params.status = statusFilter;
     }
-    catch (err) {
-      if (err.response?.status !== 401) {
-        const message =
-          err.response?.data?.message ||
-          "Failed to fetch tasks.";
-        setError(message);
-        toast.error(message);
-      }
+    if (priorityFilter !== "all") {
+      params.priority = priorityFilter;
     }
-
-    finally {
-
-      setLoading(false);
-
+    if (sortOrder) {
+      params.sort = sortOrder;
     }
-
+    return params;
   };
+
   if (loading) {
     return (
       <div className="page-container">
@@ -97,124 +60,163 @@ function Dashboard() {
       </div>
     );
   }
-  const deleteTask = (id) => {
+  const openDeleteModal = (id) => {
     setSelectedTaskId(id);
     setShowDeleteModal(true);
   };
   const confirmDelete = async () => {
     try {
-      await API.delete(`/tasks/${selectedTaskId}`);
-      toast.success("Task Deleted Successfully!");
-      fetchTasks();
+      await deleteTask(
+        selectedTaskId,
+        buildQueryParams()
+      );
     }
-
     catch (err) {
-      if (err.response?.status !== 401) {
-        toast.error(
-          err.response?.data?.message ||
-          "Unable to delete task."
-        );
-      }
-    }
 
+      console.error(err);
+
+    }
     finally {
       setShowDeleteModal(false);
       setSelectedTaskId(null);
     }
   };
+  const searchedTasks = tasks.filter((task) => {
+
+    return task.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+  });
+  const clearAllFilters = () => {
+    setStatusFilter("all");
+    setPriorityFilter("all");
+    setSortOrder("asc");
+  };
+  const filtersChanged =
+    statusFilter !== "all" ||
+    priorityFilter !== "all" ||
+    sortOrder !== "asc"
+    ;
+  const hasSearch = searchTerm.trim() !== "";
+
+  const hasFilters =
+    statusFilter !== "all" ||
+    priorityFilter !== "all" ||
+    sortOrder !== "asc"
+    ;
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
 
-        <div>
+        <div className="dashboard-title">
 
-          <h1 className="welc">Welcome Back</h1>
+          <h1 className="welc">
+            Welcome Back
+          </h1>
 
-          <p>Manage your daily work efficiently.</p>
+          <p>
+            Manage your daily work efficiently.
+          </p>
 
         </div>
 
-        <button
-          className="create-btn"
-          onClick={() => navigate("/task")}
-        >
-          + Create Task
-        </button>
+        <div className="dashboard-actions">
 
-      </div>
+          <div className="search-box">
 
-      <div className="filter-section">
+            <span className="search-icon">
+              🔍
+            </span>
 
-        <div className="filter-toolbar">
-
-          <h3 className="filter-title">
-            Filter By
-          </h3>
-
-          <div className="filter-group">
-
-            <label>Status</label>
-
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="todo">To Do</option>
-              <option value="in-progress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
-
+            <input
+              type="text"
+              placeholder="Search tasks..."
+              value={searchTerm}
+              onChange={(e) =>
+                setSearchTerm(e.target.value)
+              }
+            />
+            {
+              searchTerm && (
+                <button
+                  className="clear-search"
+                  onClick={() => setSearchTerm("")}
+                  type="button"
+                >
+                  ✕
+                </button>
+              )
+            }
           </div>
-
-          <div className="filter-group">
-
-            <label>Priority</label>
-
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-
-          </div>
-
-          <div className="filter-group">
-
-            <label>Sort By</label>
-
-            <select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            >
-              <option value="asc">Oldest First</option>
-              <option value="desc">Newest First</option>
-            </select>
-
-          </div>
-
-          <div className="task-counter">
-
-            Showing <strong>{tasks.length}</strong> of{" "}
-            <strong>{tasks.length}</strong> Tasks
-
-          </div>
+          <button
+            className="create-btn"
+            onClick={() => navigate("/task")}
+          >
+            + Create Task
+          </button>
 
         </div>
 
       </div>
+
+      <FilterBar
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        priorityFilter={priorityFilter}
+        setPriorityFilter={setPriorityFilter}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+        totalTasks={tasks.length}
+        filteredCount={searchedTasks.length}
+      />
       {
-        tasks.length === 0 ?
+        searchedTasks.length === 0 ?
           (
             <div className="empty-state">
-              <h3>No Tasks Found</h3>
+
+              <h3>🔍 No Tasks Found</h3>
+
               <p>
-                No task matches the selected filters.
+                {
+                  hasSearch && hasFilters
+                    ? "No task matches your current search and filters."
+                    : hasSearch
+                      ? "No task matches your search."
+                      : "No task matches the selected filters."
+                }
               </p>
+
+              {hasSearch && !hasFilters && (
+                <button
+                  className="clear-search-btn"
+                  onClick={() => setSearchTerm("")}
+                >
+                  Clear Search
+                </button>
+              )}
+
+              {!hasSearch && hasFilters && (
+                <button
+                  className="clear-filter-btn"
+                  onClick={clearAllFilters}
+                >
+                  Clear Filters
+                </button>
+              )}
+
+              {hasSearch && hasFilters && (
+                <button
+                  className="clear-filter-btn"
+                  onClick={() => {
+                    setSearchTerm("");
+                    clearAllFilters();
+                  }}
+                >
+                  Reset All
+                </button>
+              )}
+
             </div>
           )
           :
@@ -223,7 +225,7 @@ function Dashboard() {
 
               {
 
-                tasks.map((task) => (
+                searchedTasks.map((task) => (
 
                   <TaskCard
 
@@ -235,7 +237,7 @@ function Dashboard() {
                       navigate(`/task/${task._id}`)
                     }
 
-                    onDelete={deleteTask}
+                    onDelete={openDeleteModal}
 
                   />
 
