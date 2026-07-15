@@ -1,11 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
+import { useSelector, useDispatch } from "react-redux";
+import { toggleTheme } from "../redux/themeSlice";
 
 function Navbar() {
     const navigate = useNavigate();
     const { token, logout } = useAuth();
-    const { darkMode, toggleTheme } = useTheme();
+    const dispatch = useDispatch();
+
+    const darkMode = useSelector(
+        (state) => state.theme.darkMode
+    );
     const handleLogout = () => {
         logout();
         navigate("/");
@@ -26,17 +31,15 @@ function Navbar() {
                         {/* <Link to="/task">Create Task</Link> */}
                         <button
                             className="theme-toggle"
-                            onClick={toggleTheme}
                             type="button"
+                            onClick={() => dispatch(toggleTheme())}
                         >
                             <span className="theme-icon">
                                 {darkMode ? "☀️" : "🌙"}
                             </span>
-
                             <span>
                                 {darkMode ? "Light" : "Dark"}
                             </span>
-
                         </button>
 
                         <button

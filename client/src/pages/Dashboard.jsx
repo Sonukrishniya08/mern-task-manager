@@ -152,6 +152,7 @@ function Dashboard() {
           <button
             className="create-btn"
             onClick={() => navigate("/task")}
+            
           >
             + Create Task
           </button>

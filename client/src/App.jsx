@@ -6,10 +6,24 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import TaskForm from "./pages/TaskForm";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 import "./App.css";
 
- function App() {
+function App() {
+
+  const darkMode = useSelector(
+    (state) => state.theme.darkMode
+  );
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark-theme");
+    } else {
+      document.body.classList.remove("dark-theme");
+    }
+  }, [darkMode]);
+
   return (
     <>
       <Navbar />
